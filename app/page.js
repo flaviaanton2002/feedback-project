@@ -1,3 +1,5 @@
+import FeedbackItem from "./components/FeedbackItem";
+
 export default function Home() {
   return (
     <main className="bg-white md:max-w-2xl mx-auto md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
@@ -7,7 +9,7 @@ export default function Home() {
           Help me decide the name of the app
         </p>
       </div>
-      <div className="bg-gray-100 px-8 py-2 flex border-b">
+      <div className="bg-gray-100 px-8 py-4 flex border-b">
         <div className="grow"></div>
         <div>
           <button className="bg-pink-500 py-1 px-4 rounded-md text-white text-opacity-90">
@@ -15,21 +17,12 @@ export default function Home() {
           </button>
         </div>
       </div>
-      <div className="px-8 py-4">
-        <div className="flex gap-8 items-center">
-          <div>
-            <h2>Name 1</h2>
-            <p className="text-gray-600 text-sm">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-          </div>
-          <div>
-            <button className="shadow-sm shadow-gray-200 border rounded-md py-1 px-4">
-              ^80
-            </button>
-          </div>
-        </div>
+      <div className="px-8">
+        <FeedbackItem></FeedbackItem>
+        <FeedbackItem></FeedbackItem>
+        <FeedbackItem></FeedbackItem>
+        <FeedbackItem></FeedbackItem>
+        <FeedbackItem></FeedbackItem>
       </div>
     </main>
   );
