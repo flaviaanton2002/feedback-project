@@ -30,7 +30,7 @@ export default function Home() {
   ];
   return (
     <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
-      <div className="bg-gradient-to-r from-pink-400 to-orange-400 p-8">
+      <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
         <h1 className="font-bold text-xl">My App</h1>
         <p className="text-opacity-90 text-slate-700">
           Help me decide the name of the app
