@@ -9,3 +9,9 @@ export async function POST(req) {
   await Feedback.create({ title, description, uploads });
   return Response.json(jsonBody);
 }
+
+export async function GET() {
+  const mongoUrl = process.env.MONGO_URL;
+  mongoose.connect(mongoUrl);
+  return Response.json(await Feedback.find());
+}

@@ -2,32 +2,23 @@
 import Button from "./components/Button";
 import FeedbackFormPopup from "./components/FeedbackFormPopup";
 import FeedbackItem from "./components/FeedbackItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FeedbackItemPopup from "./components/FeedbackItemPopup";
+import axios from "axios";
 
 export default function Home() {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
+  const [feedbacks, setFeedbacks] = useState([]);
+  useEffect(() => {
+    axios.get("/api/feedback").then((res) => setFeedbacks(res.data));
+  }, []);
   function openFeedbackPopupForm() {
     setShowFeedbackPopupForm(true);
   }
   function openFeedbackPopupItem(feedback) {
     setShowFeedbackPopupItem(feedback);
   }
-  const feedbacks = [
-    {
-      title: "Name 1",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      votesCount: 80,
-    },
-    {
-      title: "Name 2",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua two.",
-      votesCount: 63,
-    },
-  ];
   return (
     <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
       <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
