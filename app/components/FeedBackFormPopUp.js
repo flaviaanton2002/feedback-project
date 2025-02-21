@@ -3,6 +3,7 @@ import Button from "./Button";
 import { useState } from "react";
 import axios from "axios";
 import PaperClip from "./icons/PaperClip";
+import Trash from "./icons/Trash";
 
 export default function FeedbackFormPopup({ setShow }) {
   const [title, setTitle] = useState("");
@@ -23,6 +24,12 @@ export default function FeedbackFormPopup({ setShow }) {
     const res = await axios.post("/api/upload", data);
     setUploads((existingUploads) => {
       return [...existingUploads, ...res.data];
+    });
+  }
+  function handleRemoveFileButtonClick(e, link) {
+    e.preventDefault();
+    setUploads((currentUploads) => {
+      return currentUploads.filter((val) => val !== link);
     });
   }
   return (
@@ -46,9 +53,20 @@ export default function FeedbackFormPopup({ setShow }) {
         {uploads?.length > 0 && (
           <div>
             <label className="block mt-2 mb-1 text-slate-700">Files</label>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               {uploads.map((link, index) => (
-                <a href={link} target="_blank" className="h-16" key={index}>
+                <a
+                  href={link}
+                  target="_blank"
+                  className="h-16 relative"
+                  key={index}
+                >
+                  <button
+                    onClick={(e) => handleRemoveFileButtonClick(e, link)}
+                    className="-right-2 -top-2 absolute bg-red-400 p-1 rounded-md text-white"
+                  >
+                    <Trash />
+                  </button>
                   {/.(jpg|png)$/.test(link) ? (
                     <img className="h-16 w-auto rounded-md" src={link} alt="" />
                   ) : (
