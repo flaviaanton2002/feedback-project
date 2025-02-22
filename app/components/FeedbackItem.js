@@ -2,23 +2,35 @@
 import { useState } from "react";
 import Popup from "./Popup";
 import Button from "./Button";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import axios from "axios";
+import { MoonLoader } from "react-spinners";
 
 export default function FeedbackItem({
   onOpen,
   _id,
   title,
   description,
-  votesCount,
+  votes,
+  onVotesChange,
+  parentLoagingVotes = true,
 }) {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-  const isLoggedIn = false;
+  const [isVotesLoading, setIsVotesLoading] = useState(false);
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user?.email;
   function handleVoteButtonClick(e) {
     e.stopPropagation();
     e.preventDefault();
     if (!isLoggedIn) {
       localStorage.setItem("vote_after_login", _id);
       setShowLoginPopup(true);
+    } else {
+      setIsVotesLoading(true);
+      axios.post("/api/vote", { feedbackId: _id }).then(async () => {
+        await onVotesChange();
+        setIsVotesLoading(false);
+      });
     }
   }
   async function handleGoogleLoginButtonClick(e) {
@@ -26,6 +38,7 @@ export default function FeedbackItem({
     e.preventDefault();
     await signIn("google");
   }
+  const iVoted = !!votes.find((v) => v.userEmail === session?.user?.email);
   return (
     <a
       href=""
@@ -53,13 +66,19 @@ export default function FeedbackItem({
             </div>
           </Popup>
         )}
-        <button
+        <Button
+          primary={iVoted ? "true" : undefined}
           onClick={handleVoteButtonClick}
-          className="shadow-sm shadow-gray-200 border rounded-md py-1 px-4 flex items-center gap-1 text-gray-600"
+          className="shadow-sm border "
         >
-          <span className="triangle-vote-up"></span>
-          {votesCount || "0"}
-        </button>
+          {!isVotesLoading && (
+            <>
+              <span className="triangle-vote-up"></span>
+              {votes?.length || "0"}
+            </>
+          )}
+          {isVotesLoading && <MoonLoader size={18} />}
+        </Button>
       </div>
     </a>
   );

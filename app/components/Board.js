@@ -10,18 +10,35 @@ export default function Board() {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
+  const [isVotesLoading, setIsVotesLoading] = useState(false);
+  const [votes, setVotes] = useState([]);
   const { data: session } = useSession();
   useEffect(() => {
-    axios.get("/api/feedback").then((res) => setFeedbacks(res.data));
+    axios.get("/api/feedback").then((res) => {
+      setFeedbacks(res.data);
+    });
   }, []);
+  useEffect(() => {
+    fetchVotes();
+  }, [feedbacks]);
   useEffect(() => {
     if (session?.user?.email) {
       const feedbackId = localStorage.getItem("vote_after_login");
       if (feedbackId) {
-        alert(feedbackId);
+        axios.post("/api/vote", { feedbackId }).then(() => {
+          localStorage.removeItem("vote_after_login");
+          fetchVotes();
+        });
       }
     }
   }, [session?.user?.email]);
+  async function fetchVotes() {
+    setIsVotesLoading(true);
+    const ids = feedbacks.map((f) => f._id);
+    const res = await axios.get("/api/vote?feedbackIds=" + ids.join(","));
+    setVotes(res.data);
+    setIsVotesLoading(false);
+  }
   function openFeedbackPopupForm() {
     setShowFeedbackPopupForm(true);
   }
@@ -51,6 +68,11 @@ export default function Board() {
           <FeedbackItem
             key={index}
             {...feedback}
+            onVotesChange={fetchVotes}
+            votes={votes.filter(
+              (v) => v.feedbackId.toString() === feedback._id.toString()
+            )}
+            parentLoagingVotes={isVotesLoading}
             onOpen={() => openFeedbackPopupItem(feedback)}
           />
         ))}
@@ -61,6 +83,10 @@ export default function Board() {
       {showFeedbackPopupItem && (
         <FeedbackItemPopup
           {...showFeedbackPopupItem}
+          votes={votes.filter(
+            (v) => v.feedbackId.toString() === showFeedbackPopupItem._id
+          )}
+          onVotesChange={fetchVotes}
           setShow={setShowFeedbackPopupItem}
         />
       )}
