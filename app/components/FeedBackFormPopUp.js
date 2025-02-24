@@ -5,8 +5,9 @@ import axios from "axios";
 import PaperClip from "./icons/PaperClip";
 import Trash from "./icons/Trash";
 import { MoonLoader } from "react-spinners";
+import Attachments from "./Attachment";
 
-export default function FeedbackFormPopup({ setShow }) {
+export default function FeedbackFormPopup({ setShow, onCreate }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploads, setUploads] = useState([]);
@@ -15,6 +16,7 @@ export default function FeedbackFormPopup({ setShow }) {
     e.preventDefault();
     axios.post("/api/feedback", { title, description, uploads }).then(() => {
       setShow(false);
+      onCreate();
     });
   }
   async function handleAttachFilesInputChange(e) {
@@ -59,27 +61,14 @@ export default function FeedbackFormPopup({ setShow }) {
             <label className="block mt-2 mb-1 text-slate-700">Files</label>
             <div className="flex gap-3">
               {uploads.map((link, index) => (
-                <a
-                  href={link}
-                  target="_blank"
-                  className="h-16 relative"
+                <Attachments
                   key={index}
-                >
-                  <button
-                    onClick={(e) => handleRemoveFileButtonClick(e, link)}
-                    className="-right-2 -top-2 absolute bg-red-400 p-1 rounded-md text-white"
-                  >
-                    <Trash />
-                  </button>
-                  {/.(jpg|png)$/.test(link) ? (
-                    <img className="h-16 w-auto rounded-md" src={link} alt="" />
-                  ) : (
-                    <div className="bg-gray-200 h-16 p-2 flex items-center rounded-md">
-                      <PaperClip className="size-4" />
-                      {link.split("/")[3].substring(13)}
-                    </div>
-                  )}
-                </a>
+                  link={link}
+                  showRemoveButton={true}
+                  handleRemoveFileButtonClick={(e, link) =>
+                    handleRemoveFileButtonClick(e, link)
+                  }
+                />
               ))}
             </div>
           </div>

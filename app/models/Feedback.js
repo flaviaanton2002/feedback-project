@@ -3,7 +3,7 @@ import { model, models, Schema } from "mongoose";
 const feedbackSchema = new Schema(
   {
     title: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     uploads: { type: [String] },
   },
   { timestamps: true }
