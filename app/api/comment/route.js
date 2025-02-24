@@ -20,6 +20,22 @@ export async function POST(req) {
   return Response.json(commentDoc);
 }
 
+export async function PUT(req) {
+  const mongoUrl = process.env.MONGO_URL;
+  mongoose.connect(mongoUrl);
+  const jsonBody = await req.json();
+  const { id, text, uploads } = jsonBody;
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json(false);
+  }
+  const newCommentDoc = await Comment.findOneAndUpdate(
+    { userEmail: session.user.email, _id: id },
+    { text, uploads }
+  );
+  return Response.json(newCommentDoc);
+}
+
 export async function GET(req) {
   const mongoUrl = process.env.MONGO_URL;
   mongoose.connect(mongoUrl);
@@ -28,14 +44,7 @@ export async function GET(req) {
     const result = await Comment.find({
       feedbackId: url.searchParams.get("feedbackId"),
     }).populate("user");
-    return Response.json(
-      result.map((doc) => {
-        const { userEmail, ...commentWithoutEmail } = doc.toJSON();
-        const { email, ...userWithoutEmail } = commentWithoutEmail.user;
-        commentWithoutEmail.user = userWithoutEmail;
-        return commentWithoutEmail;
-      })
-    );
+    return Response.json(result);
   }
   return Response.json(false);
 }

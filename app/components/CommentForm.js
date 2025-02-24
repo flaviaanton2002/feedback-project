@@ -65,7 +65,6 @@ export default function CommentForm({ feedbackId, onPost }) {
           primary="true"
           disabled={commentText === ""}
         >
-          {" "}
           {session ? "Comment" : "Login and comment"}
         </Button>
       </div>

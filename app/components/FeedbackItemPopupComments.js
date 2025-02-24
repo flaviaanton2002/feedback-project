@@ -4,9 +4,15 @@ import CommentForm from "./CommentForm";
 import axios from "axios";
 import Attachment from "./Attachment";
 import TimeAgo from "timeago-react";
+import { useSession } from "next-auth/react";
+import AttachFilesButton from "./AttachFilesButton";
 
 export default function FeedbackItemPopupComments({ feedbackId }) {
   const [comments, setComments] = useState([]);
+  const [editingComment, setEditingComment] = useState(null);
+  const [newCommentText, setNewCommentText] = useState("");
+  const [newCommentUploads, setNewCommentUploads] = useState([]);
+  const { data: session } = useSession();
   useEffect(() => {
     fetchComments();
   }, []);
@@ -15,31 +21,125 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
       setComments(res.data);
     });
   }
+  function handleEditButtonClick(comment) {
+    setEditingComment(comment);
+    setNewCommentText(comment.text);
+    setNewCommentUploads(comment.uploads);
+  }
+  function handleCancelButtonClick() {
+    setNewCommentText("");
+    setEditingComment(null);
+    setNewCommentUploads([]);
+  }
+  function handleRemoveFileButtonClick(e, linkToRemove) {
+    e.preventDefault();
+    setNewCommentUploads((prevNewCommentUploads) =>
+      prevNewCommentUploads.filter((l) => l !== linkToRemove)
+    );
+  }
+  function handleNewLinks(newLinks) {
+    setNewCommentUploads((currentLinks) => [...currentLinks, ...newLinks]);
+  }
+  async function handleSaveButtonClick() {
+    const newData = { text: newCommentText, uploads: newCommentUploads };
+    await axios.put("/api/comment", { id: editingComment._id, ...newData });
+    setComments((existingComments) => {
+      return existingComments.map((comment) => {
+        if (comment._id === editingComment._id) {
+          return { ...comment, ...newData };
+        } else {
+          return comment;
+        }
+      });
+    });
+    setEditingComment(null);
+  }
   return (
     <div className="p-8">
       {comments?.length > 0 &&
-        comments.map((comment, index) => (
-          <div key={index} className="mb-8">
-            <div className="flex gap-4">
-              <Avatar url={comment.user.image} />
-              <div>
-                <p className="text-gray-600">{comment.text}</p>
-                <div className="text-gray-400 mt-2 text-sm">
-                  {comment.user.name} &middot;{" "}
-                  <TimeAgo datetime={comment.createdAt} locale="en_US" />
-                </div>
-                {comment.uploads?.length > 0 && (
-                  <div className="flex gap-2 mt-3">
-                    {comment.uploads.map((link, index) => (
-                      <Attachment key={index} link={link} />
-                    ))}
+        comments.map((comment, index) => {
+          const editingThis = editingComment?._id === comment?._id;
+          const isAuthor =
+            !!comment.user.email && comment.user.email === session?.user?.email;
+          return (
+            <div key={index} className="mb-8">
+              <div className="flex gap-4">
+                <Avatar url={comment.user.image} />
+                <div>
+                  {editingThis && (
+                    <textarea
+                      value={newCommentText}
+                      onChange={(e) => setNewCommentText(e.target.value)}
+                      className="border p-2 block w-full"
+                    />
+                  )}
+                  {!editingThis && (
+                    <p className="text-gray-600">{comment.text}</p>
+                  )}
+                  <div className="text-gray-400 mt-2 text-sm">
+                    {comment.user.name}
+                    &nbsp;&middot;&nbsp;
+                    <TimeAgo datetime={comment.createdAt} locale="en_US" />
+                    {!editingThis && isAuthor && (
+                      <>
+                        &nbsp;&middot;&nbsp;
+                        <span
+                          onClick={() => handleEditButtonClick(comment)}
+                          className="hover:underline cursor-pointer"
+                        >
+                          Edit
+                        </span>
+                      </>
+                    )}
+                    {editingThis && (
+                      <>
+                        &nbsp;&middot;&nbsp;
+                        <span
+                          onClick={handleCancelButtonClick}
+                          className="hover:underline cursor-pointer"
+                        >
+                          Cancel
+                        </span>
+                        &nbsp;&middot;&nbsp;
+                        <span
+                          onClick={handleSaveButtonClick}
+                          className="hover:underline cursor-pointer"
+                        >
+                          Save changes
+                        </span>
+                      </>
+                    )}
                   </div>
-                )}
+                  {(editingThis ? newCommentUploads : comment.uploads)?.length >
+                    0 && (
+                    <div className="flex gap-2 mt-3">
+                      {(editingThis ? newCommentUploads : comment.uploads).map(
+                        (link, index) => (
+                          <Attachment
+                            key={index}
+                            handleRemoveFileButtonClick={
+                              handleRemoveFileButtonClick
+                            }
+                            showRemoveButton={editingThis}
+                            link={link}
+                          />
+                        )
+                      )}
+                    </div>
+                  )}
+                  {editingThis && (
+                    <div className="mt-2">
+                      <AttachFilesButton onNewFiles={handleNewLinks} />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      <CommentForm feedbackId={feedbackId} onPost={fetchComments} />
+          );
+        })}
+      {!editingComment && (
+        <CommentForm feedbackId={feedbackId} onPost={fetchComments} />
+      )}
     </div>
   );
 }
