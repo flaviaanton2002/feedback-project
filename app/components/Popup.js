@@ -28,11 +28,11 @@ export default function Popup({ setShow, children, title, narrow }) {
           />
         </svg>
       </button>
-      <div className="w-full">
+      <div className="w-full h-full overflow-y-scroll">
         <div
           className={
             (narrow ? "md:max-w-sm " : "md:max-w-2xl ") +
-            "bg-white md:mx-auto md:rounded-lg overflow-hidden"
+            "bg-white md:mx-auto md:my-8 md:rounded-lg overflow-hidden"
           }
           onClick={(e) => e.stopPropagation()}
         >
