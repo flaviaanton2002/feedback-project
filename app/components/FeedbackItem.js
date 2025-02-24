@@ -69,7 +69,7 @@ export default function FeedbackItem({
         <Button
           primary={iVoted ? "true" : undefined}
           onClick={handleVoteButtonClick}
-          className="shadow-sm border "
+          className="shadow-sm border"
         >
           {!isVotesLoading && (
             <>

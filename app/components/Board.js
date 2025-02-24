@@ -1,3 +1,4 @@
+"use client";
 import Button from "./Button";
 import FeedbackFormPopup from "./FeedbackFormPopup";
 import FeedbackItem from "./FeedbackItem";
@@ -51,7 +52,6 @@ export default function Board() {
 
   return (
     <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
-      {session?.user?.email || "not logged in"}
       <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
         <h1 className="font-bold text-xl">My App</h1>
         <p className="text-opacity-90 text-slate-700">
