@@ -6,7 +6,7 @@ import { useState } from "react";
 import { MoonLoader } from "react-spinners";
 import { useSession } from "next-auth/react";
 import Tick from "./icons/Tick";
-import Attachments from "./Attachment";
+import Attachment from "./Attachment";
 
 export default function FeedbackItemPopup({
   _id,
@@ -37,7 +37,7 @@ export default function FeedbackItemPopup({
             <span className="text-sm text-gray-600">Attachments:</span>
             <div className="flex gap-2">
               {uploads.map((link, index) => (
-                <Attachments key={index} link={link} />
+                <Attachment key={index} link={link} />
               ))}
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function FeedbackItemPopup({
           )}
         </Button>
       </div>
-      <FeedbackItemPopupComments />
+      <FeedbackItemPopupComments feedbackId={_id} />
     </Popup>
   );
 }

@@ -55,7 +55,7 @@ export default function Board() {
       <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
         <h1 className="font-bold text-xl">My App</h1>
         <p className="text-opacity-90 text-slate-700">
-          Help me decide the name of the app
+          Help me decide the logo of the app
         </p>
       </div>
       <div className="bg-gray-100 px-8 py-4 flex border-b">
