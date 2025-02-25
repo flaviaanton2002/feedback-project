@@ -2,6 +2,17 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Vote } from "@/app/models/Vote";
+import { Feedback } from "@/app/models/Feedback";
+
+async function recountVotes(feedbackId) {
+  const count = await Vote.countDocuments({ feedbackId });
+  await Feedback.updateOne(
+    { _id: feedbackId },
+    {
+      votesCountCached: count,
+    }
+  );
+}
 
 export async function POST(req) {
   const mongoUrl = process.env.MONGO_URL;
@@ -15,9 +26,11 @@ export async function POST(req) {
   const existingVote = await Vote.findOne({ feedbackId, userEmail });
   if (existingVote) {
     await Vote.findByIdAndDelete(existingVote._id);
+    await recountVotes(feedbackId);
     return Response.json(existingVote);
   } else {
     const voteDoc = await Vote.create({ feedbackId, userEmail });
+    await recountVotes(feedbackId);
     return Response.json(voteDoc);
   }
 }

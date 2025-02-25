@@ -12,6 +12,7 @@ export default function Board() {
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [isVotesLoading, setIsVotesLoading] = useState(false);
+  const [sort, setSort] = useState("votes");
   const [votes, setVotes] = useState([]);
   const { data: session } = useSession();
   useEffect(() => {
@@ -20,6 +21,9 @@ export default function Board() {
   useEffect(() => {
     fetchVotes();
   }, [feedbacks]);
+  useEffect(() => {
+    fetchFeedbacks();
+  }, [sort]);
   useEffect(() => {
     if (session?.user?.email) {
       const feedbackToVote = localStorage.getItem("vote_after_login");
@@ -53,7 +57,7 @@ export default function Board() {
     }
   }, [session?.user?.email]);
   async function fetchFeedbacks() {
-    axios.get("/api/feedback").then((res) => {
+    axios.get("/api/feedback?sort=" + sort).then((res) => {
       setFeedbacks(res.data);
     });
   }
@@ -86,7 +90,18 @@ export default function Board() {
         </p>
       </div>
       <div className="bg-gray-100 px-8 py-4 flex border-b">
-        <div className="grow"></div>
+        <div className="grow flex items-center">
+          <span className="text-gray-400 text-sm">Sort by:</span>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="bg-transparent py-2 text-gray-600"
+          >
+            <option value="votes">Most voted</option>
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </div>
         <div>
           <Button primary="true" onClick={openFeedbackPopupForm}>
             Make a suggestion

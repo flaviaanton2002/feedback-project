@@ -46,6 +46,19 @@ export async function GET(req) {
   if (url.searchParams.get("id")) {
     return Response.json(await Feedback.findById(url.searchParams.get("id")));
   } else {
-    return Response.json(await Feedback.find().populate("user"));
+    const sortParam = url.searchParams.get("sort");
+    let sortDef;
+    if (sortParam === "votes") {
+      sortDef = { votesCountCached: -1 };
+    }
+    if (sortParam === "latest") {
+      sortDef = { createdAt: -1 };
+    }
+    if (sortParam === "oldest") {
+      sortDef = { createdAt: 1 };
+    }
+    return Response.json(
+      await Feedback.find(null, null, { sort: sortDef }).populate("user")
+    );
   }
 }
