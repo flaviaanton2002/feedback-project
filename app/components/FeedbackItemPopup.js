@@ -90,7 +90,14 @@ export default function FeedbackItemPopup({
             onChange={(e) => setNewDescription(e.target.value)}
           />
         )}
-        {!isEditMode && <p className="text-gray-600">{description}</p>}
+        {!isEditMode && (
+          <p
+            className="text-gray-600"
+            dangerouslySetInnerHTML={{
+              __html: description.replace(/\n/gi, "<br />"),
+            }}
+          />
+        )}
         {uploads?.length > 0 && (
           <div className=" mt-4">
             <span className="text-sm text-gray-600">Attachments:</span>

@@ -39,6 +39,7 @@ export default function FeedbackItem({
     await signIn("google");
   }
   const iVoted = !!votes.find((v) => v.userEmail === session?.user?.email);
+  const shortDesc = description.substring(0, 200);
   return (
     <a
       href=""
@@ -50,7 +51,10 @@ export default function FeedbackItem({
     >
       <div className="flex-grow">
         <h2 className="font-bold">{title}</h2>
-        <p className="text-gray-600 text-sm">{description}</p>
+        <p className="text-gray-600 text-sm">
+          {shortDesc}
+          {shortDesc.length < description.length ? "..." : ""}
+        </p>
       </div>
       <div>
         {showLoginPopup && (
