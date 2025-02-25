@@ -2,17 +2,23 @@
 import Button from "./Button";
 import FeedbackFormPopup from "./FeedbackFormPopup";
 import FeedbackItem from "./FeedbackItem";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FeedbackItemPopup from "./FeedbackItemPopup";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { MoonLoader } from "react-spinners";
 
 export default function Board() {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [isVotesLoading, setIsVotesLoading] = useState(false);
+  const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
+  const fetchingFeedbacksRef = useRef(false);
   const [sort, setSort] = useState("votes");
+  const sortRef = useRef("votes");
+  const loadedRows = useRef(0);
+  const everythingLoadedRef = useRef(false);
   const [votes, setVotes] = useState([]);
   const { data: session } = useSession();
   useEffect(() => {
@@ -22,6 +28,9 @@ export default function Board() {
     fetchVotes();
   }, [feedbacks]);
   useEffect(() => {
+    loadedRows.current = "";
+    sortRef.current = sort;
+    everythingLoadedRef.current = false;
     fetchFeedbacks();
   }, [sort]);
   useEffect(() => {
@@ -56,10 +65,55 @@ export default function Board() {
       }
     }
   }, [session?.user?.email]);
-  async function fetchFeedbacks() {
-    axios.get("/api/feedback?sort=" + sort).then((res) => {
-      setFeedbacks(res.data);
-    });
+  useEffect(() => {
+    registerScrollListener();
+    return () => {
+      unregisterScrollListener();
+    };
+  }, []);
+  function handleScroll() {
+    const html = window.document.querySelector("html");
+    const howMuchScrolled = html.scrollTop;
+    const howMuchIsToScroll = html.scrollHeight;
+    const leftToScroll =
+      howMuchIsToScroll - howMuchScrolled - html.clientHeight;
+    if (leftToScroll <= 100) {
+      fetchFeedbacks(true);
+    }
+  }
+  function registerScrollListener() {
+    window.addEventListener("scroll", handleScroll);
+  }
+  function unregisterScrollListener() {
+    window.removeEventListener("scroll", handleScroll);
+  }
+  async function fetchFeedbacks(append = false) {
+    if (fetchingFeedbacksRef.current) return;
+    if (everythingLoadedRef.current) return;
+    fetchingFeedbacksRef.current = true;
+    setFetchingFeedbacks(true);
+    axios
+      .get(
+        `/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}`
+      )
+      .then((res) => {
+        if (append) {
+          setFeedbacks((currentFeedbacks) => [
+            ...currentFeedbacks,
+            ...res.data,
+          ]);
+        } else {
+          setFeedbacks(res.data);
+        }
+        if (res.data?.length > 0) {
+          loadedRows.current += res.data.length;
+        }
+        if (res.data?.length === 0) {
+          everythingLoadedRef.current = true;
+        }
+        fetchingFeedbacksRef.current = false;
+        setFetchingFeedbacks(false);
+      });
   }
   async function fetchVotes() {
     setIsVotesLoading(true);
@@ -80,9 +134,8 @@ export default function Board() {
     });
     await fetchFeedbacks();
   }
-
   return (
-    <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-8 overflow-hidden">
+    <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-4 md:mb-8 overflow-hidden">
       <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
         <h1 className="font-bold text-xl">My App</h1>
         <p className="text-opacity-90 text-slate-700">
@@ -94,7 +147,9 @@ export default function Board() {
           <span className="text-gray-400 text-sm">Sort by:</span>
           <select
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
+            onChange={(e) => {
+              setSort(e.target.value);
+            }}
             className="bg-transparent py-2 text-gray-600"
           >
             <option value="votes">Most voted</option>
@@ -121,6 +176,11 @@ export default function Board() {
             onOpen={() => openFeedbackPopupItem(feedback)}
           />
         ))}
+        {fetchingFeedbacks && (
+          <div className="p-4">
+            <MoonLoader size={24} />
+          </div>
+        )}
       </div>
       {showFeedbackPopupForm && (
         <FeedbackFormPopup

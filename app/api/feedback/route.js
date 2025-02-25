@@ -47,6 +47,7 @@ export async function GET(req) {
     return Response.json(await Feedback.findById(url.searchParams.get("id")));
   } else {
     const sortParam = url.searchParams.get("sort");
+    const loadedRows = url.searchParams.get("loadedRows");
     let sortDef;
     if (sortParam === "votes") {
       sortDef = { votesCountCached: -1 };
@@ -58,7 +59,11 @@ export async function GET(req) {
       sortDef = { createdAt: 1 };
     }
     return Response.json(
-      await Feedback.find(null, null, { sort: sortDef }).populate("user")
+      await Feedback.find(null, null, {
+        sort: sortDef,
+        skip: loadedRows,
+        limit: 10,
+      }).populate("user")
     );
   }
 }
