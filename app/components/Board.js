@@ -7,19 +7,26 @@ import FeedbackItemPopup from "./FeedbackItemPopup";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { MoonLoader } from "react-spinners";
+import Search from "./icons/Search";
+import { debounce } from "lodash";
 
 export default function Board() {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
-  const [isVotesLoading, setIsVotesLoading] = useState(false);
-  const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
   const fetchingFeedbacksRef = useRef(false);
+  const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
+  const watingRef = useRef(false);
+  const [wating, setWating] = useState(false);
+  const [isVotesLoading, setIsVotesLoading] = useState(false);
   const [sort, setSort] = useState("votes");
   const sortRef = useRef("votes");
   const loadedRows = useRef(0);
   const everythingLoadedRef = useRef(false);
   const [votes, setVotes] = useState([]);
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const searchPhraseRef = useRef("");
+  const debouncedFetchFeedbacksRef = useRef(debounce(fetchFeedbacks, 300));
   const { data: session } = useSession();
   useEffect(() => {
     fetchFeedbacks();
@@ -28,11 +35,17 @@ export default function Board() {
     fetchVotes();
   }, [feedbacks]);
   useEffect(() => {
-    loadedRows.current = "";
+    loadedRows.current = 0;
     sortRef.current = sort;
+    searchPhraseRef.current = searchPhrase;
     everythingLoadedRef.current = false;
-    fetchFeedbacks();
-  }, [sort]);
+    if (feedbacks?.length > 0) {
+      setFeedbacks([]);
+    }
+    setWating(true);
+    watingRef.current = true;
+    debouncedFetchFeedbacksRef.current();
+  }, [sort, searchPhrase]);
   useEffect(() => {
     if (session?.user?.email) {
       const feedbackToVote = localStorage.getItem("vote_after_login");
@@ -65,12 +78,6 @@ export default function Board() {
       }
     }
   }, [session?.user?.email]);
-  useEffect(() => {
-    registerScrollListener();
-    return () => {
-      unregisterScrollListener();
-    };
-  }, []);
   function handleScroll() {
     const html = window.document.querySelector("html");
     const howMuchScrolled = html.scrollTop;
@@ -87,6 +94,12 @@ export default function Board() {
   function unregisterScrollListener() {
     window.removeEventListener("scroll", handleScroll);
   }
+  useEffect(() => {
+    registerScrollListener();
+    return () => {
+      unregisterScrollListener();
+    };
+  }, []);
   async function fetchFeedbacks(append = false) {
     if (fetchingFeedbacksRef.current) return;
     if (everythingLoadedRef.current) return;
@@ -94,7 +107,7 @@ export default function Board() {
     setFetchingFeedbacks(true);
     axios
       .get(
-        `/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}`
+        `/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}&search=${searchPhraseRef.current}`
       )
       .then((res) => {
         if (append) {
@@ -113,6 +126,8 @@ export default function Board() {
         }
         fetchingFeedbacksRef.current = false;
         setFetchingFeedbacks(false);
+        watingRef.current = false;
+        setWating(false);
       });
   }
   async function fetchVotes() {
@@ -142,20 +157,29 @@ export default function Board() {
           Help me decide the logo of the app
         </p>
       </div>
-      <div className="bg-gray-100 px-8 py-4 flex border-b">
-        <div className="grow flex items-center">
-          <span className="text-gray-400 text-sm">Sort by:</span>
+      <div className="bg-gray-100 px-8 py-4 flex items-center border-b">
+        <div className="grow flex items-center gap-4 text-gray-400">
           <select
             value={sort}
             onChange={(e) => {
               setSort(e.target.value);
             }}
-            className="bg-transparent py-2 text-gray-600"
+            className="bg-transparent py-2"
           >
             <option value="votes">Most voted</option>
             <option value="latest">Latest</option>
             <option value="oldest">Oldest</option>
           </select>
+          <div className="relative">
+            <Search className="size-4 absolute top-3 left-2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchPhrase}
+              onChange={(e) => setSearchPhrase(e.target.value)}
+              className="bg-transparent p-2 pl-7"
+            />
+          </div>
         </div>
         <div>
           <Button primary="true" onClick={openFeedbackPopupForm}>
@@ -164,6 +188,9 @@ export default function Board() {
         </div>
       </div>
       <div className="px-8">
+        {feedbacks?.length === 0 && !fetchingFeedbacks && !wating && (
+          <div className="py-8 text-4xl text-gray-200">Nothing found :(</div>
+        )}
         {feedbacks.map((feedback, index) => (
           <FeedbackItem
             key={index}
@@ -176,7 +203,7 @@ export default function Board() {
             onOpen={() => openFeedbackPopupItem(feedback)}
           />
         ))}
-        {fetchingFeedbacks && (
+        {(fetchingFeedbacks || wating) && (
           <div className="p-4">
             <MoonLoader size={24} />
           </div>
