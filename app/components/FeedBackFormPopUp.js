@@ -57,9 +57,9 @@ export default function FeedbackFormPopup({ setShow, onCreate }) {
           <div>
             <label className="block mt-2 mb-1 text-slate-700">Files</label>
             <div className="flex gap-3">
-              {uploads.map((link, index) => (
+              {uploads.map((link) => (
                 <Attachment
-                  key={index}
+                  key={"form" + link}
                   link={link}
                   showRemoveButton={true}
                   handleRemoveFileButtonClick={(e, link) =>

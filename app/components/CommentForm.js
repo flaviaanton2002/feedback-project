@@ -44,8 +44,8 @@ export default function CommentForm({ feedbackId, onPost }) {
         <div className="">
           <div className="text-sm text-gray-600 mb-2 mt-3">Files:</div>
           <div className="flex gap-3">
-            {uploads.map((link, index) => (
-              <div key={index}>
+            {uploads.map((link) => (
+              <div key={"comment-form" + link}>
                 <Attachment
                   link={link}
                   showRemoveButton={true}
