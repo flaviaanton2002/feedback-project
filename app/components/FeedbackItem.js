@@ -81,14 +81,14 @@ export default function FeedbackItem({
             setShow={setShowLoginPopup}
           >
             <div className="p-4">
-              <Button primary="true" onClick={handleGoogleLoginButtonClick}>
+              <Button primary={1} onClick={handleGoogleLoginButtonClick}>
                 login with google
               </Button>
             </div>
           </Popup>
         )}
         <Button
-          primary={iVoted ? "true" : undefined}
+          primary={iVoted ? 1 : undefined}
           onClick={handleVoteButtonClick}
           className="shadow-sm border"
         >

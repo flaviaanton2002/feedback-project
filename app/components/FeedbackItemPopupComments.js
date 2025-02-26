@@ -62,7 +62,7 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
           const isAuthor =
             !!comment.user.email && comment.user.email === session?.user?.email;
           return (
-            <div key={index} className="mb-8">
+            <div className="mb-8" key={comment._id}>
               <div className="flex gap-4">
                 <Avatar url={comment.user.image} />
                 <div>
@@ -114,9 +114,9 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
                     0 && (
                     <div className="flex gap-2 mt-3">
                       {(editingThis ? newCommentUploads : comment.uploads).map(
-                        (link, index) => (
+                        (link) => (
                           <Attachment
-                            key={index}
+                            key={"edit" + comment._id + link}
                             handleRemoveFileButtonClick={
                               handleRemoveFileButtonClick
                             }

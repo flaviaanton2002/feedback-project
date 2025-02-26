@@ -114,9 +114,9 @@ export default function FeedbackItemPopup({
           <div className=" mt-4">
             <span className="text-sm text-gray-600">Attachments:</span>
             <div className="flex gap-2">
-              {(isEditMode ? newUploads : uploads).map((link, index) => (
+              {(isEditMode ? newUploads : uploads).map((link) => (
                 <Attachment
-                  key={index}
+                  key={_id + link}
                   link={link}
                   handleRemoveFileButtonClick={handleRemoveFileButtonClick}
                   showRemoveButton={isEditMode}
@@ -134,7 +134,7 @@ export default function FeedbackItemPopup({
               <Trash classnName="size-4" />
               Cancel
             </Button>
-            <Button primary="true" onClick={handleSaveButtonClick}>
+            <Button primary={1} onClick={handleSaveButtonClick}>
               Save changes
             </Button>
           </>
@@ -159,7 +159,7 @@ export default function FeedbackItemPopup({
           </select>
         )}
         {!isEditMode && (
-          <Button primary="true" onClick={handleVoteButtonClick}>
+          <Button primary={1} onClick={handleVoteButtonClick}>
             {isVotesLoading && <MoonLoader size={18} />}
             {!isVotesLoading && (
               <>

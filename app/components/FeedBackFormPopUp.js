@@ -72,7 +72,7 @@ export default function FeedbackFormPopup({ setShow, onCreate }) {
         )}
         <div className="flex gap-2 mt-2 justify-end">
           <AttachFilesButton onNewFiles={addNewUploads} />
-          <Button primary="true" onClick={handleCreatePostButtonClick}>
+          <Button primary={1} onClick={handleCreatePostButtonClick}>
             {session ? "Create post" : "Login and post"}
           </Button>
         </div>
