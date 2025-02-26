@@ -147,6 +147,7 @@ export default function Board() {
     setShowFeedbackPopupItem((prevData) => {
       return { ...prevData, ...newData };
     });
+    loadedRows.current = 0;
     await fetchFeedbacks();
   }
   return (

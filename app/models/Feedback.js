@@ -5,6 +5,7 @@ const feedbackSchema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String },
+    status: { type: String, default: "new" },
     uploads: { type: [String] },
     userEmail: { type: String, required: true },
     votesCountCached: { type: Number, default: 0 },

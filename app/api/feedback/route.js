@@ -24,19 +24,18 @@ export async function PUT(req) {
   const mongoUrl = process.env.MONGO_URL;
   mongoose.connect(mongoUrl);
   const jsonBody = await req.json();
-  const { title, description, uploads, id } = jsonBody;
+  const { title, description, uploads, id, status } = jsonBody;
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json(false);
   }
-  const newFeedbackDoc = await Feedback.updateOne(
-    { _id: id, userEmail: session.user.email },
-    {
-      title,
-      description,
-      uploads,
-    }
-  );
+  const isAdmin = session.user.email === "flaviaanton2002@gmail.com";
+  const updateData = status ? { status } : { title, description, uploads };
+  const filter = { _id: id };
+  if (!isAdmin) {
+    filter.userEmail = session.user.email;
+  }
+  const newFeedbackDoc = await Feedback.updateOne(filter, updateData);
   return Response.json(newFeedbackDoc);
 }
 
