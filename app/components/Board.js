@@ -17,26 +17,29 @@ export default function Board() {
   const fetchingFeedbacksRef = useRef(false);
   const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
   const watingRef = useRef(false);
-  const [wating, setWating] = useState(false);
+  const [wating, setWating] = useState(true);
   const [isVotesLoading, setIsVotesLoading] = useState(false);
-  const [sort, setSort] = useState("votes");
-  const sortRef = useRef("votes");
+  const [sortOrFilter, setSortOrFilter] = useState("votes");
+  const sortOrFilterRef = useRef("votes");
   const loadedRows = useRef(0);
   const everythingLoadedRef = useRef(false);
   const [votes, setVotes] = useState([]);
   const [searchPhrase, setSearchPhrase] = useState("");
   const searchPhraseRef = useRef("");
+  const [didMount, setDidMount] = useState(false);
   const debouncedFetchFeedbacksRef = useRef(debounce(fetchFeedbacks, 300));
   const { data: session } = useSession();
-  useEffect(() => {
-    fetchFeedbacks();
-  }, []);
   useEffect(() => {
     fetchVotes();
   }, [feedbacks]);
   useEffect(() => {
+    if (!didMount) {
+      fetchFeedbacks();
+      setDidMount(true);
+      return;
+    }
     loadedRows.current = 0;
-    sortRef.current = sort;
+    sortOrFilterRef.current = sortOrFilter;
     searchPhraseRef.current = searchPhrase;
     everythingLoadedRef.current = false;
     if (feedbacks?.length > 0) {
@@ -45,7 +48,7 @@ export default function Board() {
     setWating(true);
     watingRef.current = true;
     debouncedFetchFeedbacksRef.current();
-  }, [sort, searchPhrase]);
+  }, [sortOrFilter, searchPhrase, didMount]);
   useEffect(() => {
     if (session?.user?.email) {
       const feedbackToVote = localStorage.getItem("vote_after_login");
@@ -107,7 +110,7 @@ export default function Board() {
     setFetchingFeedbacks(true);
     axios
       .get(
-        `/api/feedback?sort=${sortRef.current}&loadedRows=${loadedRows.current}&search=${searchPhraseRef.current}`
+        `/api/feedback?sortOrFilter=${sortOrFilterRef.current}&loadedRows=${loadedRows.current}&search=${searchPhraseRef.current}`
       )
       .then((res) => {
         if (append) {
@@ -161,15 +164,19 @@ export default function Board() {
       <div className="bg-gray-100 px-8 py-4 flex items-center border-b">
         <div className="grow flex items-center gap-4 text-gray-400">
           <select
-            value={sort}
+            value={sortOrFilter}
             onChange={(e) => {
-              setSort(e.target.value);
+              setSortOrFilter(e.target.value);
             }}
             className="bg-transparent py-2"
           >
             <option value="votes">Most voted</option>
             <option value="latest">Latest</option>
             <option value="oldest">Oldest</option>
+            <option value="planned">Planned</option>
+            <option value="in_progress">In progress</option>
+            <option value="complete">Complete</option>
+            <option value="archived">Archived</option>
           </select>
           <div className="relative">
             <Search className="size-4 absolute top-3 left-2 pointer-events-none" />
