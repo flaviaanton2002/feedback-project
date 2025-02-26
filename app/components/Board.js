@@ -9,11 +9,13 @@ import { useSession } from "next-auth/react";
 import { MoonLoader } from "react-spinners";
 import Search from "./icons/Search";
 import { debounce } from "lodash";
+import { usePathname } from "next/navigation";
 
 export default function Board() {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbacksFetchCount, setFeedbacksFetchCount] = useState(0);
   const fetchingFeedbacksRef = useRef(false);
   const [fetchingFeedbacks, setFetchingFeedbacks] = useState(false);
   const watingRef = useRef(false);
@@ -27,6 +29,7 @@ export default function Board() {
   const [searchPhrase, setSearchPhrase] = useState("");
   const searchPhraseRef = useRef("");
   const [didMount, setDidMount] = useState(false);
+  const pathname = usePathname();
   const debouncedFetchFeedbacksRef = useRef(debounce(fetchFeedbacks, 300));
   const { data: session } = useSession();
   useEffect(() => {
@@ -48,7 +51,30 @@ export default function Board() {
     setWating(true);
     watingRef.current = true;
     debouncedFetchFeedbacksRef.current();
-  }, [sortOrFilter, searchPhrase, didMount]);
+  }, [sortOrFilter, searchPhrase]);
+  useEffect(() => {
+    if (!didMount) {
+      return;
+    }
+    if (showFeedbackPopupItem) {
+      window.history.pushState(
+        {},
+        "",
+        `/feedback/${showFeedbackPopupItem._id}`
+      );
+    } else {
+      window.history.pushState({}, "", `/`);
+    }
+  }, [showFeedbackPopupItem]);
+  console.log({ pathname });
+  useEffect(() => {
+    if (feedbacksFetchCount === 1 && /^\/feedback\/[a-z0-9]+/.test(pathname)) {
+      const feedbackId = pathname.replace("/feedback/", "");
+      axios.get("/api/feedback?id=" + feedbackId).then((res) => {
+        setShowFeedbackPopupItem(res.data);
+      });
+    }
+  }, [feedbacksFetchCount]);
   useEffect(() => {
     if (session?.user?.email) {
       const feedbackToVote = localStorage.getItem("vote_after_login");
@@ -113,6 +139,7 @@ export default function Board() {
         `/api/feedback?sortOrFilter=${sortOrFilterRef.current}&loadedRows=${loadedRows.current}&search=${searchPhraseRef.current}`
       )
       .then((res) => {
+        setFeedbacksFetchCount((prevCount) => prevCount + 1);
         if (append) {
           setFeedbacks((currentFeedbacks) => [
             ...currentFeedbacks,
