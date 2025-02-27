@@ -8,7 +8,7 @@ export async function POST(req) {
   const mongoUrl = process.env.MONGO_URL;
   mongoose.connect(mongoUrl);
   const jsonBody = await req.json();
-  const { title, description, uploads } = jsonBody;
+  const { title, description, uploads, boardName } = jsonBody;
   const session = await getServerSession(authOptions);
   const userEmail = session.user.email;
   const feedbackDoc = await Feedback.create({
@@ -16,6 +16,7 @@ export async function POST(req) {
     description,
     uploads,
     userEmail,
+    boardName,
   });
   return Response.json(feedbackDoc);
 }
@@ -49,8 +50,9 @@ export async function GET(req) {
     const sortOrFilter = url.searchParams.get("sortOrFilter");
     const loadedRows = url.searchParams.get("loadedRows");
     const searchPhrase = url.searchParams.get("search");
+    const boardName = url.searchParams.get("boardName");
     let sortDef = {};
-    let filter = {};
+    const filter = { boardName };
     if (sortOrFilter === "latest") {
       sortDef = { createdAt: -1 };
     }
@@ -75,13 +77,11 @@ export async function GET(req) {
           limit: 20,
         }
       );
-      filter = {
-        $or: [
-          { title: { $regex: ".*" + searchPhrase + ".*" } },
-          { description: { $regex: ".*" + searchPhrase + ".*" } },
-          { _id: comments.map((c) => c.feedbackId) },
-        ],
-      };
+      filter["$or"] = [
+        { title: { $regex: ".*" + searchPhrase + ".*" } },
+        { description: { $regex: ".*" + searchPhrase + ".*" } },
+        { _id: comments.map((c) => c.feedbackId) },
+      ];
     }
     return Response.json(
       await Feedback.find(filter, null, {

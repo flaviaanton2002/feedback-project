@@ -15,7 +15,7 @@ import {
 } from "../libs/boardFunctions";
 import { FeedbacksFetchContext } from "../hooks/FeedbacksFetchContext";
 
-export default function Board() {
+export default function Board({ name }) {
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbacksFetchCount, setFeedbacksFetchCount] = useState(0);
@@ -68,8 +68,8 @@ export default function Board() {
       return;
     }
     const url = showFeedbackPopupItem
-      ? `/feedback/${showFeedbackPopupItem._id}`
-      : "/";
+      ? `/board/${name}/feedback/${showFeedbackPopupItem._id}`
+      : "/board/" + name;
     window.history.pushState({}, "", url);
   }, [showFeedbackPopupItem]);
   useEffect(() => {
@@ -91,6 +91,7 @@ export default function Board() {
     fetchingFeedbacksRef.current = true;
     setFetchingFeedbacks(true);
     fetchSpecificFeedbacks({
+      boardName: name,
       sortOrFilter: sortOrFilterRef.current,
       loadedRows: loadedRows.current,
       search: searchPhraseRef.current,
@@ -131,7 +132,13 @@ export default function Board() {
   return (
     <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-4 md:mb-8 overflow-hidden">
       <FeedbacksFetchContext.Provider
-        value={{ sortOrFilter, setSortOrFilter, searchPhrase, setSearchPhrase }}
+        value={{
+          sortOrFilter,
+          setSortOrFilter,
+          searchPhrase,
+          boardName: name,
+          setSearchPhrase,
+        }}
       >
         <BoardHeader onNewFeedback={fetchFeedbacks} />
       </FeedbacksFetchContext.Provider>

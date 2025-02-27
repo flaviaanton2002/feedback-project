@@ -5,23 +5,27 @@ import axios from "axios";
 import Attachment from "./Attachment";
 import AttachFilesButton from "./AttachFilesButton";
 import { signIn, useSession } from "next-auth/react";
+import UseBoardName from "../hooks/UseBoardName";
 
 export default function FeedbackFormPopup({ setShow, onCreate }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [uploads, setUploads] = useState([]);
   const { data: session } = useSession();
+  const boardName = UseBoardName();
   async function handleCreatePostButtonClick(e) {
     e.preventDefault();
     if (session) {
-      axios.post("/api/feedback", { title, description, uploads }).then(() => {
-        setShow(false);
-        onCreate();
-      });
+      axios
+        .post("/api/feedback", { title, description, uploads, boardName })
+        .then(() => {
+          setShow(false);
+          onCreate();
+        });
     } else {
       localStorage.setItem(
         "post_after_login",
-        JSON.stringify({ title, description, uploads })
+        JSON.stringify({ title, description, uploads, boardName })
       );
       await signIn("google");
     }
