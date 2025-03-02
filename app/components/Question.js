@@ -9,7 +9,7 @@ export default function Question({ question, children }) {
   return (
     <div className="rounded-lg overflow-hidden my-4">
       <button
-        className="w-full flex gap-2 items-center bg-rose-300 bg-opacity-50 text-xl p-4 cursor-pointer"
+        className="w-full flex gap-2 items-center bg-rose-300 bg-opacity-50 md:text-xl p-4 cursor-pointer"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         {!isOpen && <ChevronDown className="size-6 text-rose-800" />}

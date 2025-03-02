@@ -30,3 +30,19 @@ body {
 li.tick-cercle {
   @apply flex gap-1 my-2;
 }
+
+div.nav-popup {
+  @apply hidden;
+}
+
+label.mobile-nav {
+  @apply relative z-30;
+}
+
+input#navCb:checked ~ div.nav-popup {
+  @apply block;
+}
+
+input#navCb {
+  @apply hidden;
+}

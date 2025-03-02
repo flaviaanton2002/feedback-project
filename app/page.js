@@ -2,12 +2,12 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <section className="grid gap-8 grid-cols-2 my-24 items-center">
-      <div className="">
+    <section className="grid grid-cols-1 gap-24 text-center my-16">
+      <div>
         <h1 className="text-4xl mb-4 leading-tight">
           Your users will love FeedbackBoard
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 mb-8 max-w-xl mx-auto">
           Experience a seamless, collaborative solution for user requests. Say
           goodbye to outdated spreadsheets and chaotic boards. Empower your
           customers, gain priceless insights.
@@ -20,8 +20,12 @@ export default function Home() {
         </Link>
       </div>
       <div className="relative">
-        <img src="/board.png" alt="" className="relative z-10" />
-        <div className="bg-rose-400 bg-opacity-40 w-[300px] h-[300px] rounded-full absolute left-[50%] -ml-[150px] top-[50%] -mt-[150px]"></div>
+        <img
+          src="/board.png"
+          alt=""
+          className="relative z-10 max-w-full md:max-w-lg mx-auto"
+        />
+        <div className="bg-rose-400 bg-opacity-20 w-[360px] h-[360px] rounded-full absolute left-[50%] -ml-[180px] top-[50%] -mt-[180px]"></div>
       </div>
     </section>
   );
