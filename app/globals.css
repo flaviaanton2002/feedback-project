@@ -19,7 +19,7 @@ body {
 }
 
 .tick-cercle:before {
-  @apply block bg-rose-300 w-6 h-6 rounded-full flex items-center justify-center;
+  @apply bg-rose-300 w-6 h-6 rounded-full flex items-center justify-center;
   content: "✓";
 }
 

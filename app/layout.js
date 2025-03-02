@@ -35,7 +35,7 @@ export default async function RootLayout({ children }) {
         {!isBoardPage && (
           <main className="mx-auto max-w-4xl">
             <header className="flex gap-8 text-gray-600 h-24 items-center">
-              <Link href="" className="text-primary font-bold text-xl">
+              <Link href="/" className="text-primary font-bold text-xl">
                 FeedbackBoard
               </Link>
               <nav className="flex gap-4 grow">

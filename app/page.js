@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <section className="grid gap-8 grid-cols-2 my-24 items-center">
       <div className="">
-        <h1 className="text-4xl font-bold mb-4 leading-tight">
+        <h1 className="text-4xl mb-4 leading-tight">
           Your users will love FeedbackBoard
         </h1>
         <p className="text-gray-600 mb-8">
