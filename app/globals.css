@@ -17,3 +17,16 @@ body {
 .text-white > .triangle-vote-up {
   border-color: transparent transparent #fff transparent;
 }
+
+.tick-cercle:before {
+  @apply block bg-rose-300 w-6 h-6 rounded-full flex items-center justify-center;
+  content: "✓";
+}
+
+.tick-cercle.primary:before {
+  @apply bg-primary text-white;
+}
+
+li.tick-cercle {
+  @apply flex gap-1 my-2;
+}
