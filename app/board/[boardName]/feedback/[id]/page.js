@@ -1,16 +1,13 @@
 "use client";
 import Board from "@/app/components/Board";
-import Header from "@/app/components/Header";
+import { useNarrowHeader } from "@/app/hooks/AppContext";
 import { BoardInfoProvider } from "@/app/hooks/UseBoardInfo";
-import { SessionProvider } from "next-auth/react";
 
 export default function FeedbackPage() {
+  useNarrowHeader();
   return (
-    <SessionProvider>
-      <BoardInfoProvider>
-        <Header />
-        <Board />
-      </BoardInfoProvider>
-    </SessionProvider>
+    <BoardInfoProvider>
+      <Board />
+    </BoardInfoProvider>
   );
 }

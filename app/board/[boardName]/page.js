@@ -1,17 +1,13 @@
 "use client";
 import Board from "@/app/components/Board";
-import Header from "@/app/components/Header";
-import { BoardInfoProvider, UseBoardSlug } from "@/app/hooks/UseBoardInfo";
-import { SessionProvider } from "next-auth/react";
+import { useNarrowHeader } from "@/app/hooks/AppContext";
+import { BoardInfoProvider } from "@/app/hooks/UseBoardInfo";
 
 export default function BoardPage() {
-  const boardName = UseBoardSlug();
+  useNarrowHeader();
   return (
-    <SessionProvider>
-      <BoardInfoProvider>
-        <Header />
-        <Board />
-      </BoardInfoProvider>
-    </SessionProvider>
+    <BoardInfoProvider>
+      <Board />
+    </BoardInfoProvider>
   );
 }

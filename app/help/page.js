@@ -1,7 +1,10 @@
+"use client";
 import Question from "../components/Question";
+import { useWideHeader } from "../hooks/AppContext";
 
 export default function Help() {
   const email = "support@feedback.com";
+  useWideHeader();
   return (
     <div className="mt-16">
       <h1 className="text-center text-4xl mb-6">Help center</h1>

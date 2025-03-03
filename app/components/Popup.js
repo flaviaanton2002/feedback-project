@@ -6,7 +6,7 @@ export default function Popup({ setShow, children, title, narrow }) {
   }
   return (
     <div
-      className="fixed z-10 inset-0 bg-white md:bg-black md:bg-opacity-80 flex md:items-center"
+      className="fixed z-40 inset-0 bg-white md:bg-black md:bg-opacity-80 flex md:items-center"
       onClick={close}
     >
       <button

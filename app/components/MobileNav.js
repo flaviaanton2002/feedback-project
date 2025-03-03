@@ -1,11 +1,21 @@
 import { useState } from "react";
 import BarsTwo from "./icons/BarsTwo";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function MobileNav() {
   const [navOpen, setNavOpen] = useState(false);
   const { status: sessionStatus } = useSession();
+  const router = useRouter();
+  function login() {
+    const isBoardPage = window.location.href.includes("/board/");
+    if (isBoardPage) {
+      signIn("google");
+    } else {
+      router.push("/account");
+    }
+  }
   return (
     <>
       <label
@@ -38,24 +48,35 @@ export default function MobileNav() {
               </Link>
               {sessionStatus === "unauthenticated" && (
                 <>
-                  <Link
+                  <button
                     className="block py-4 w-full uppercase"
-                    href={"/account"}
+                    onClick={login}
                   >
                     Login
-                  </Link>
-                  <Link
+                  </button>
+                  <button
                     className="block py-4 w-full uppercase"
-                    href={"/account"}
+                    onClick={login}
                   >
                     Register
-                  </Link>
+                  </button>
                 </>
               )}
               {sessionStatus === "authenticated" && (
-                <Link className="block py-4 w-full uppercase" href={"/account"}>
-                  Account
-                </Link>
+                <>
+                  <Link
+                    className="block py-4 w-full uppercase"
+                    href={"/account"}
+                  >
+                    Account
+                  </Link>
+                  <button
+                    className="block py-4 w-full uppercase"
+                    onClick={() => signOut()}
+                  >
+                    Logout
+                  </button>
+                </>
               )}
             </nav>
           </div>
