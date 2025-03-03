@@ -10,6 +10,11 @@ import Attachment from "./Attachment";
 import Edit from "./icons/Edit";
 import AttachFilesButton from "./AttachFilesButton";
 import Trash from "./icons/Trash";
+import {
+  isBoardAdmin,
+  UseBoardName,
+  UseIsBoardAdmin,
+} from "../hooks/UseBoardInfo";
 
 export default function FeedbackItemPopup({
   _id,
@@ -29,8 +34,16 @@ export default function FeedbackItemPopup({
   const [newDescription, setNewDescription] = useState(description);
   const [newUploads, setNewUploads] = useState(uploads);
   const [newStatus, setNewStatus] = useState(status || "new");
+  const [isAdmin, setIsAdmin] = useState(undefined);
   const { data: session } = useSession();
-  const isAdmin = session?.user?.email === "flaviaanton2002@gmail.com";
+  const boardName = UseBoardName();
+  useEffect(() => {
+    if (boardName) {
+      isBoardAdmin(boardName).then((resultIsAdmin) => {
+        setIsAdmin(resultIsAdmin);
+      });
+    }
+  }, [boardName]);
   useEffect(() => {
     if (newStatus === status) {
       return;

@@ -19,7 +19,7 @@ export default function BoardHeader({ onNewFeedback }) {
           setShow={setShowFeedbackPopupForm}
         />
       )}
-      <div className="bg-gradient-to-r from-orange-400 to-pink-400 p-8">
+      <div className="bg-gradient-to-r from-red-400 to-pink-400 p-8">
         <h1 className="font-bold text-xl">My App</h1>
         <p className="text-opacity-90 text-slate-700">
           Help me decide the logo of the app

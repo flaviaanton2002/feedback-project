@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Comment } from "@/app/models/Comment";
+import { Board } from "@/app/models/Board";
 
 export async function POST(req) {
   const mongoUrl = process.env.MONGO_URL;
@@ -30,10 +31,19 @@ export async function PUT(req) {
   if (!session) {
     return Response.json(false);
   }
-  const isAdmin = session.user.email === "flaviaanton2002@gmail.com";
-  const updateData = status ? { status } : { title, description, uploads };
+  const feedbackDoc = await Feedback.findById(id);
+  const boardName = feedbackDoc.boardName;
+  const isAdmin = Board.exists({
+    name: boardName,
+    adminEmail: session.user.email,
+  });
+
+  // update existing feedback
   const filter = { _id: id };
-  if (!isAdmin) {
+  const updateData = { title, description, uploads };
+  if (isAdmin) {
+    updateData.status = status;
+  } else {
     filter.userEmail = session.user.email;
   }
   const newFeedbackDoc = await Feedback.updateOne(filter, updateData);
