@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
 import { headers } from "next/headers";
 import LandingHeader from "./components/LandingHeader";
+import AuthProvider from "./hooks/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +22,7 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   const headersList = await headers();
   const referer = headersList.get("referer");
-  const path = new URL(referer).pathname;
+  const path = referer ? new URL(referer).pathname : "/";
   const isBoardPage = path.startsWith("/board/");
   return (
     <html lang="en">
@@ -35,8 +35,10 @@ export default async function RootLayout({ children }) {
         {isBoardPage && <>{children}</>}
         {!isBoardPage && (
           <main className="mx-auto max-w-4xl px-4">
-            <LandingHeader />
-            {children}
+            <AuthProvider>
+              <LandingHeader />
+              {children}
+            </AuthProvider>
           </main>
         )}
       </body>

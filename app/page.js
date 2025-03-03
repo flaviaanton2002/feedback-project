@@ -13,7 +13,7 @@ export default function Home() {
           customers, gain priceless insights.
         </p>
         <Link
-          href={"/register"}
+          href={"/account"}
           className="bg-primary text-white px-6 py-4 rounded-lg"
         >
           Try for free &rarr;
