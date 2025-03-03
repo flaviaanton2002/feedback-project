@@ -14,8 +14,9 @@ import {
   postLoginActions,
 } from "../libs/boardFunctions";
 import { FeedbacksFetchContext } from "../hooks/FeedbacksFetchContext";
+import { UseBoardSlug } from "../hooks/UseBoardInfo";
 
-export default function Board({ name }) {
+export default function Board() {
   const [showFeedbackPopupItem, setShowFeedbackPopupItem] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [feedbacksFetchCount, setFeedbacksFetchCount] = useState(0);
@@ -32,6 +33,7 @@ export default function Board({ name }) {
   const [searchPhrase, setSearchPhrase] = useState("");
   const searchPhraseRef = useRef("");
   const pathname = usePathname();
+  const slug = UseBoardSlug();
   const debouncedFetchFeedbacksRef = useRef(debounce(fetchFeedbacks, 300));
   const { data: session } = useSession();
   useEffect(() => {
@@ -68,8 +70,8 @@ export default function Board({ name }) {
       return;
     }
     const url = showFeedbackPopupItem
-      ? `/board/${name}/feedback/${showFeedbackPopupItem._id}`
-      : "/board/" + name;
+      ? `/board/${slug}/feedback/${showFeedbackPopupItem._id}`
+      : "/board/" + slug;
     window.history.pushState({}, "", url);
   }, [showFeedbackPopupItem]);
   useEffect(() => {
@@ -91,7 +93,7 @@ export default function Board({ name }) {
     fetchingFeedbacksRef.current = true;
     setFetchingFeedbacks(true);
     fetchSpecificFeedbacks({
-      boardName: name,
+      boardName: slug,
       sortOrFilter: sortOrFilterRef.current,
       loadedRows: loadedRows.current,
       search: searchPhraseRef.current,
@@ -136,7 +138,6 @@ export default function Board({ name }) {
           sortOrFilter,
           setSortOrFilter,
           searchPhrase,
-          boardName: name,
           setSearchPhrase,
         }}
       >

@@ -3,11 +3,14 @@ import Button from "./Button";
 import Search from "./icons/Search";
 import { FeedbacksFetchContext } from "../hooks/FeedbacksFetchContext";
 import FeedbackFormPopup from "./FeedbackFormPopup";
+import { BoardInfoContext, UseBoardSlug } from "../hooks/UseBoardInfo";
 
 export default function BoardHeader({ onNewFeedback }) {
   const [showFeedbackPopupForm, setShowFeedbackPopupForm] = useState(false);
   const { sortOrFilter, setSortOrFilter, searchPhrase, setSearchPhrase } =
     useContext(FeedbacksFetchContext);
+  const slug = UseBoardSlug();
+  const { name: boardName, description } = useContext(BoardInfoContext);
   function openFeedbackPopupForm() {
     setShowFeedbackPopupForm(true);
   }
@@ -20,10 +23,8 @@ export default function BoardHeader({ onNewFeedback }) {
         />
       )}
       <div className="bg-gradient-to-r from-red-400 to-pink-400 p-8">
-        <h1 className="font-bold text-xl">My App</h1>
-        <p className="text-opacity-90 text-slate-700">
-          Help me decide the logo of the app
-        </p>
+        <h1 className="font-bold text-xl">{boardName}</h1>
+        <p className="text-opacity-90 text-slate-700">{description}</p>
       </div>
       <div className="bg-gray-100 px-8 py-4 flex items-center border-b">
         <div className="grow flex items-center gap-4 text-gray-400">

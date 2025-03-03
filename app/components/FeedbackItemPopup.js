@@ -10,11 +10,7 @@ import Attachment from "./Attachment";
 import Edit from "./icons/Edit";
 import AttachFilesButton from "./AttachFilesButton";
 import Trash from "./icons/Trash";
-import {
-  isBoardAdmin,
-  UseBoardName,
-  UseIsBoardAdmin,
-} from "../hooks/UseBoardInfo";
+import { isBoardAdmin, UseBoardName } from "../hooks/UseBoardInfo";
 
 export default function FeedbackItemPopup({
   _id,

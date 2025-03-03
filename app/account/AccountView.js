@@ -31,14 +31,17 @@ export default function AccountView() {
           <Link
             key={index}
             className="bg-white p-4 rounded-md shadow-sm h-24 flex items-center justify-center"
-            href={"/board/" + board.name}
+            href={"/board/" + board.slug}
           >
             <span>{board.name}</span>
           </Link>
         ))}
-        <button className="bg-rose-300 rounded-md shadow-sm">
+        <Link
+          href={"/account/new-board"}
+          className="flex items-center justify-center bg-rose-300 rounded-md shadow-sm"
+        >
           <span>Add new board+</span>
-        </button>
+        </Link>
       </div>
     </>
   );
