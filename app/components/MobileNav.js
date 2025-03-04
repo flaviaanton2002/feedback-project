@@ -1,7 +1,9 @@
+"use client";
 import { useState } from "react";
 import BarsTwo from "./icons/BarsTwo";
 import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { loginAndRedirect, logoutAndRedirect } from "../hooks/AppContext";
 import { useRouter } from "next/navigation";
 
 export default function MobileNav() {
@@ -9,12 +11,7 @@ export default function MobileNav() {
   const { status: sessionStatus } = useSession();
   const router = useRouter();
   function login() {
-    const isBoardPage = window.location.href.includes("/board/");
-    if (isBoardPage) {
-      signIn("google");
-    } else {
-      router.push("/account");
-    }
+    loginAndRedirect(router, signIn);
   }
   return (
     <>
@@ -24,12 +21,7 @@ export default function MobileNav() {
       >
         <BarsTwo />
       </label>
-      <input
-        type="checkbox"
-        id="navCb"
-        checked={navOpen}
-        onChange={() => setNavOpen((prev) => !prev)}
-      />
+      <input type="checkbox" id="navCb" checked={navOpen} onChange={() => {}} />
       <div
         onClick={() => setNavOpen(false)}
         className="nav-popup fixed inset-0 bg-bgGray bg-opacity-80 p-4 rounded-2xl z-20 text-xl uppercase text-center pt-24"
@@ -72,7 +64,7 @@ export default function MobileNav() {
                   </Link>
                   <button
                     className="block py-4 w-full uppercase"
-                    onClick={() => signOut()}
+                    onClick={() => logoutAndRedirect(router, signOut)}
                   >
                     Logout
                   </button>

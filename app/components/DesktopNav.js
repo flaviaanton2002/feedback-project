@@ -1,9 +1,10 @@
+"use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import Popup from "./Popup";
 import { useRouter } from "next/navigation";
-import { UseBoardSlug } from "../hooks/UseBoardInfo";
+import { loginAndRedirect, logoutAndRedirect } from "../hooks/AppContext";
 
 export default function DesktopNav() {
   const [showUserPopup, setShowUserPopup] = useState(false);
@@ -14,12 +15,7 @@ export default function DesktopNav() {
     router.push(uri);
   }
   function login() {
-    const isBoardPage = window.location.href.includes("/board/");
-    if (isBoardPage) {
-      signIn("google");
-    } else {
-      router.push("/account");
-    }
+    loginAndRedirect(router, signIn);
   }
   return (
     <>
@@ -69,7 +65,10 @@ export default function DesktopNav() {
           </button>
           <button
             className="block w-full text-center py-4 uppercase"
-            onClick={() => signOut()}
+            onClick={() => {
+              setShowUserPopup(false);
+              logoutAndRedirect(router, signOut);
+            }}
           >
             Logout
           </button>
