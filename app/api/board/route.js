@@ -16,6 +16,10 @@ export async function GET(req) {
   const mongoUrl = process.env.MONGO_URL;
   mongoose.connect(mongoUrl);
   const url = new URL(req.url);
+  if (url.searchParams.get("id")) {
+    const board = await Board.findById(url.searchParams.get("id"));
+    return Response.json(board);
+  }
   if (url.searchParams.get("slug")) {
     const board = await Board.findOne({ slug: url.searchParams.get("slug") });
     return Response.json(board);
@@ -40,4 +44,22 @@ export async function POST(req) {
     adminEmail: session.user.email,
   });
   return Response.json(boardDoc);
+}
+
+export async function PUT(req) {
+  const mongoUrl = process.env.MONGO_URL;
+  mongoose.connect(mongoUrl);
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return Response.json(false);
+  }
+  const jsonBody = await req.json();
+  const { id, name, slug, description } = jsonBody;
+  const board = await Board.findById(id);
+  if (session.user.email !== board.adminEmail) {
+    return Response.json(false);
+  }
+  return Response.json(
+    await Board.findByIdAndUpdate(id, { name, slug, description })
+  );
 }

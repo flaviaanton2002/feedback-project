@@ -2,6 +2,7 @@ import axios from "axios";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Edit from "../components/icons/Edit";
 
 export default function AccountView() {
   const { data: session, status } = useSession();
@@ -25,13 +26,31 @@ export default function AccountView() {
       <h1 className="text-center text-4xl mb-8">Your boards:</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {boards.map((board) => (
-          <Link
+          <div
             key={"board-tile" + board.name}
-            className="bg-white p-4 rounded-md shadow-sm h-24 flex items-center justify-center"
-            href={"/board/" + board.slug}
+            className="bg-white rounded-md flex flex-col shadow-sm h-24 items-center justify-center text-center"
           >
-            <span>{board.name}</span>
-          </Link>
+            <div className="grow flex items-center">
+              <Link className="hover:underline" href={"/board/" + board.slug}>
+                {board.name}
+              </Link>
+            </div>
+            <div className="flex gap-4 p-2 w-full border-t border-gray-100 text-gray-700 text-sm">
+              <Link
+                className="w-full text-center flex gap-2 items-center justify-center"
+                href={"/account/edit-board/" + board._id}
+              >
+                <Edit className="size-4" />
+                Edit
+              </Link>
+              <Link
+                className="block w-full text-center border-l"
+                href={"/board/" + board.slug}
+              >
+                Visit &rarr;
+              </Link>
+            </div>
+          </div>
         ))}
         <Link
           href={"/account/new-board"}
