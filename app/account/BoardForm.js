@@ -1,4 +1,3 @@
-import axios from "axios";
 import Button from "../components/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,16 +6,28 @@ export default function BoardForm({
   name: defaultName,
   slug: defaultSlug,
   description: defaultDescription,
+  visibility: defaultVisibility = "public",
+  allowedEmails: defaultAllowedEmails,
   buttonText = "",
   onSubmit,
 }) {
   const [name, setName] = useState(defaultName || "");
   const [slug, setSlug] = useState(defaultSlug || "");
   const [description, setDescription] = useState(defaultDescription || "");
+  const [visibility, setVisibility] = useState(defaultVisibility || "public");
+  const [allowedEmails, setAllowedEmails] = useState(
+    defaultAllowedEmails?.join("\n") || ""
+  );
   const router = useRouter();
   async function handleFormSubmit(e) {
     e.preventDefault();
-    onSubmit({ name, slug, description });
+    onSubmit({
+      name,
+      slug,
+      description,
+      visibility,
+      allowedEmails: allowedEmails.split("\n"),
+    });
   }
   return (
     <form className="max-w-md mx-auto" onSubmit={handleFormSubmit}>
@@ -55,6 +66,45 @@ export default function BoardForm({
           className="block w-full mb-4 p-2 rounded-md"
         />
       </label>
+      <div>Visibility:</div>
+      <label className="block">
+        <input
+          type="radio"
+          name="visibility"
+          value="public"
+          checked={visibility === "public"}
+          onChange={() => setVisibility("public")}
+        />
+        Public
+      </label>
+      <label className="block">
+        <input
+          type="radio"
+          name="visibility"
+          value="invite-only"
+          checked={visibility === "invite-only"}
+          onChange={() => setVisibility("invite-only")}
+        />
+        Invite only
+      </label>
+      {visibility === "invite-only" && (
+        <div className="my-4">
+          <label>
+            <div>Who should be able to access the board?</div>
+            <div className="text-sm text-gray-600">
+              List all email adresses separated by new line
+            </div>
+            <textarea
+              className="block w-full bg-white rounded-md h-24 p-2 mt-2"
+              value={allowedEmails}
+              onChange={(e) => setAllowedEmails(e.target.value)}
+              placeholder={
+                "user1@exemple.com\nuser2@exemple.com\nuser3@exemple.com"
+              }
+            />
+          </label>
+        </div>
+      )}
       <Button
         primary={1}
         disabled={name === "" || slug === ""}

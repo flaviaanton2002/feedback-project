@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Vote } from "@/app/models/Vote";
 import { Feedback } from "@/app/models/Feedback";
+import { canWeAccessThisBoard } from "@/app/libs/boardApiFunctions";
+import { Board } from "@/app/models/Board";
 
 async function recountVotes(feedbackId) {
   const count = await Vote.countDocuments({ feedbackId });
@@ -21,6 +23,12 @@ export async function POST(req) {
   const { feedbackId } = jsonBody;
   const session = await getServerSession(authOptions);
   const { email: userEmail } = session.user;
+
+  const feedback = await Feedback.findById(feedbackId);
+  const board = await Board.findOne({ slug: feedback.boardName });
+  if (!canWeAccessThisBoard(userEmail, board)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
   // find existing vote
   const existingVote = await Vote.findOne({ feedbackId, userEmail });

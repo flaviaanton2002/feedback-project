@@ -1,6 +1,7 @@
 import axios from "axios";
-import { usePathname } from "next/navigation";
+import { unauthorized, usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
+import { MoonLoader } from "react-spinners";
 
 export const BoardInfoContext = createContext({});
 
@@ -11,25 +12,50 @@ export function UseBoardSlug() {
   return boardName;
 }
 
-export async function isBoardAdmin(boardName) {
+export async function isBoardAdmin(boardSlug) {
   const res = await axios.get("/api/board");
-  return !!res.data.find((board) => board.name === boardName);
+  return !!res.data.find((board) => board.slug === boardSlug);
 }
 
 export function BoardInfoProvider({ children }) {
   const boardSlug = UseBoardSlug();
+  const [loaded, setLoaded] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [boardName, setBoardName] = useState(boardSlug);
   const [boardAdmin, setBoardAdmin] = useState(undefined);
   const [boardDescription, setBoardDescription] = useState("");
   useEffect(() => {
     if (boardSlug) {
-      axios.get("/api/board?slug=" + boardSlug).then((res) => {
-        setBoardName(res.data.name);
-        setBoardAdmin(res.data.adminEmail);
-        setBoardDescription(res.data.description);
-      });
+      axios
+        .get("/api/board?slug=" + boardSlug)
+        .then((res) => {
+          setBoardName(res.data.name);
+          setBoardAdmin(res.data.adminEmail);
+          setBoardDescription(res.data.description);
+          setLoaded(true);
+        })
+        .catch((err) => {
+          if (err.response.status === 401) {
+            setUnauthorized(true);
+          }
+          setLoaded(true);
+        });
     }
   }, [boardSlug]);
+  if (!loaded) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <MoonLoader size={24} />
+      </div>
+    );
+  }
+  if (unauthorized) {
+    return (
+      <div className="bg-orange-200 p-4 max-w-2xl mx-auto">
+        Sorry! You are not allowed to see this board.
+      </div>
+    );
+  }
   return (
     <BoardInfoContext.Provider
       value={{

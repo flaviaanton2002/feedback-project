@@ -131,6 +131,13 @@ export default function Board() {
     loadedRows.current = 0;
     await fetchFeedbacks();
   }
+  async function refetchFeedbacks() {
+    loadedRows.current = 0;
+    sortOrFilterRef.current = sortOrFilter;
+    searchPhraseRef.current = searchPhrase;
+    everythingLoadedRef.current = false;
+    await fetchFeedbacks();
+  }
   return (
     <main className="bg-white md:max-w-2xl md:mx-auto md:shadow-lg md:rounded-lg md:mt-4 md:mb-8 overflow-hidden">
       <FeedbacksFetchContext.Provider
@@ -141,7 +148,7 @@ export default function Board() {
           setSearchPhrase,
         }}
       >
-        <BoardHeader onNewFeedback={fetchFeedbacks} />
+        <BoardHeader onNewFeedback={refetchFeedbacks} />
       </FeedbacksFetchContext.Provider>
 
       <div className="px-8">

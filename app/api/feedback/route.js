@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { Comment } from "@/app/models/Comment";
 import { Board } from "@/app/models/Board";
+import { canWeAccessThisBoard } from "@/app/libs/boardApiFunctions";
 
 export async function POST(req) {
   const mongoUrl = process.env.MONGO_URL;
@@ -12,6 +13,10 @@ export async function POST(req) {
   const { title, description, uploads, boardName } = jsonBody;
   const session = await getServerSession(authOptions);
   const userEmail = session.user.email;
+  const boardDoc = await Board.findOne({ slug: boardName });
+  if (!canWeAccessThisBoard(userEmail, boardDoc)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
   const feedbackDoc = await Feedback.create({
     title,
     description,
@@ -61,6 +66,11 @@ export async function GET(req) {
     const loadedRows = url.searchParams.get("loadedRows");
     const searchPhrase = url.searchParams.get("search");
     const boardName = url.searchParams.get("boardName");
+    const session = await getServerSession(authOptions);
+    const board = await Board.findOne({ slug: boardName });
+    if (!canWeAccessThisBoard(session?.user?.email, board)) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     let sortDef = {};
     const filter = { boardName };
     if (sortOrFilter === "latest") {
