@@ -2,6 +2,8 @@ import { Comment } from "@/app/models/Comment";
 import mongoose from "mongoose";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
+import { Feedback } from "@/app/models/Feedback";
+import { Board } from "@/app/models/Board";
 
 export async function POST(req) {
   const mongoUrl = process.env.MONGO_URL;
@@ -10,6 +12,11 @@ export async function POST(req) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json(false);
+  }
+  const feedback = await Feedback.findById(jsonBody.feedbackId);
+  const board = await Board.findOne({ slug: feedback.boardName });
+  if (board.archived) {
+    return new Response("Unauthorized", { status: 401 });
   }
   const commentDoc = await Comment.create({
     text: jsonBody.text,
@@ -24,10 +31,16 @@ export async function PUT(req) {
   const mongoUrl = process.env.MONGO_URL;
   mongoose.connect(mongoUrl);
   const jsonBody = await req.json();
-  const { id, text, uploads } = jsonBody;
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json(false);
+  }
+  const { id, text, uploads } = jsonBody;
+  const comment = await Comment.findById(id);
+  const feedback = await Feedback.findById(comment.feedbackId);
+  const board = await Board.findOne({ slug: feedback.boardName });
+  if (board.archived) {
+    return new Response("Unauthorized", { status: 401 });
   }
   const newCommentDoc = await Comment.findOneAndUpdate(
     { userEmail: session.user.email, _id: id },

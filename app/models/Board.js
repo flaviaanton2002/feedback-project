@@ -11,6 +11,7 @@ const boardSchema = new Schema({
     enum: ["public", "invite-only"],
   },
   allowedEmails: { type: [String], default: [] },
+  archived: { type: Boolean, default: false },
 });
 
 export const Board = models?.Board || model("Board", boardSchema);

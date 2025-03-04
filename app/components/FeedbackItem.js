@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Popup from "./Popup";
 import Button from "./Button";
 import { signIn, useSession } from "next-auth/react";
 import axios from "axios";
 import { MoonLoader } from "react-spinners";
+import { BoardInfoContext } from "../hooks/UseBoardInfo";
 
 export default function FeedbackItem({
   onOpen,
@@ -19,6 +20,7 @@ export default function FeedbackItem({
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [isVotesLoading, setIsVotesLoading] = useState(false);
   const { data: session } = useSession();
+  const { archived } = useContext(BoardInfoContext);
   const isLoggedIn = !!session?.user?.email;
   function handleVoteButtonClick(e) {
     e.stopPropagation();
@@ -87,19 +89,21 @@ export default function FeedbackItem({
             </div>
           </Popup>
         )}
-        <Button
-          primary={iVoted ? 1 : undefined}
-          onClick={handleVoteButtonClick}
-          className="shadow-sm border"
-        >
-          {!isVotesLoading && (
-            <>
-              <span className="triangle-vote-up"></span>
-              {votes?.length || "0"}
-            </>
-          )}
-          {isVotesLoading && <MoonLoader size={18} />}
-        </Button>
+        {!archived && (
+          <Button
+            primary={iVoted ? 1 : undefined}
+            onClick={handleVoteButtonClick}
+            className="shadow-sm border"
+          >
+            {!isVotesLoading && (
+              <>
+                <span className="triangle-vote-up"></span>
+                {votes?.length || "0"}
+              </>
+            )}
+            {isVotesLoading && <MoonLoader size={18} />}
+          </Button>
+        )}
       </div>
     </a>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Avatar from "./Avatar";
 import CommentForm from "./CommentForm";
 import axios from "axios";
@@ -6,6 +6,7 @@ import Attachment from "./Attachment";
 import TimeAgo from "timeago-react";
 import { useSession } from "next-auth/react";
 import AttachFilesButton from "./AttachFilesButton";
+import { BoardInfoContext } from "../hooks/UseBoardInfo";
 
 export default function FeedbackItemPopupComments({ feedbackId }) {
   const [comments, setComments] = useState([]);
@@ -13,6 +14,7 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
   const [newCommentText, setNewCommentText] = useState("");
   const [newCommentUploads, setNewCommentUploads] = useState([]);
   const { data: session } = useSession();
+  const { archived } = useContext(BoardInfoContext);
   useEffect(() => {
     fetchComments();
   }, []);
@@ -54,6 +56,7 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
     });
     setEditingComment(null);
   }
+  const showCommentForm = !editingComment && !archived;
   return (
     <div className="p-8">
       {comments?.length > 0 &&
@@ -80,7 +83,7 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
                     {comment.user.name}
                     &nbsp;&middot;&nbsp;
                     <TimeAgo datetime={comment.createdAt} locale="en_US" />
-                    {!editingThis && isAuthor && (
+                    {!editingThis && isAuthor && !archived && (
                       <>
                         &nbsp;&middot;&nbsp;
                         <span
@@ -137,7 +140,12 @@ export default function FeedbackItemPopupComments({ feedbackId }) {
             </div>
           );
         })}
-      {!editingComment && (
+      {comments.length === 0 && !showCommentForm && (
+        <div className="text-center text-black text-opacity-50 py-4">
+          No comments on this post.
+        </div>
+      )}
+      {showCommentForm && (
         <CommentForm feedbackId={feedbackId} onPost={fetchComments} />
       )}
     </div>

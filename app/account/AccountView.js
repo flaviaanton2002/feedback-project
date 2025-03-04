@@ -28,14 +28,20 @@ export default function AccountView() {
         {boards.map((board) => (
           <div
             key={"board-tile" + board.name}
-            className="bg-white rounded-md flex flex-col shadow-sm h-24 items-center justify-center text-center"
+            className={
+              "rounded-md flex flex-col shadow-sm h-24 items-center justify-center text-center " +
+              (board.archived ? "bg-orange-100" : "bg-white")
+            }
           >
             <div className="grow flex items-center">
               <Link className="hover:underline" href={"/board/" + board.slug}>
                 {board.name}
               </Link>
+              {board.archived && (
+                <div className="ml-2 text-orange-400">(archived)</div>
+              )}
             </div>
-            <div className="flex gap-4 p-2 w-full border-t border-gray-100 text-gray-700 text-sm">
+            <div className="flex gap-4 p-2 w-full border-t border-black border-opacity-10 text-gray-700 text-sm">
               <Link
                 className="w-full text-center flex gap-2 items-center justify-center"
                 href={"/account/edit-board/" + board._id}
@@ -44,7 +50,7 @@ export default function AccountView() {
                 Edit
               </Link>
               <Link
-                className="block w-full text-center border-l"
+                className="block w-full text-center border-l border-black border-opacity-10"
                 href={"/board/" + board.slug}
               >
                 Visit &rarr;

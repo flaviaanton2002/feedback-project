@@ -1,13 +1,16 @@
+import axios from "axios";
 import Button from "../components/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function BoardForm({
+  _id,
   name: defaultName,
   slug: defaultSlug,
   description: defaultDescription,
   visibility: defaultVisibility = "public",
   allowedEmails: defaultAllowedEmails,
+  archived: defaultArchived,
   buttonText = "",
   onSubmit,
 }) {
@@ -18,19 +21,36 @@ export default function BoardForm({
   const [allowedEmails, setAllowedEmails] = useState(
     defaultAllowedEmails?.join("\n") || ""
   );
+  const [archived, setArchived] = useState(defaultArchived || false);
   const router = useRouter();
-  async function handleFormSubmit(e) {
-    e.preventDefault();
-    onSubmit({
+  function getBoardData() {
+    return {
       name,
       slug,
       description,
       visibility,
       allowedEmails: allowedEmails.split("\n"),
-    });
+    };
+  }
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    onSubmit(getBoardData());
+  }
+  function handleArchiveButtonClick(e) {
+    e.preventDefault();
+    axios
+      .put("/api/board", { id: _id, archived: !archived, ...getBoardData() })
+      .then(() => {
+        setArchived((prev) => !prev);
+      });
   }
   return (
     <form className="max-w-md mx-auto" onSubmit={handleFormSubmit}>
+      {archived && (
+        <div className="border border-orange-400 bg-orange-200 rounded-md p-4 my-4">
+          This board is archived
+        </div>
+      )}
       <label>
         <div>Board name:</div>
         <input
@@ -108,10 +128,18 @@ export default function BoardForm({
       <Button
         primary={1}
         disabled={name === "" || slug === ""}
-        className="w-full bg-primary px-6 py-2 justify-center"
+        className="w-full bg-primary px-6 py-2 justify-center my-4"
       >
         {buttonText}
       </Button>
+      {!!_id && (
+        <Button
+          onClick={handleArchiveButtonClick}
+          className="w-full justify-center py-2 my-4 border border-gray-400"
+        >
+          {archived ? "Unarchive" : "Archive"} this board
+        </Button>
+      )}
     </form>
   );
 }

@@ -61,7 +61,8 @@ export async function PUT(req) {
     return Response.json(false);
   }
   const jsonBody = await req.json();
-  const { id, name, slug, description, visibility, allowedEmails } = jsonBody;
+  const { id, name, slug, description, visibility, allowedEmails, archived } =
+    jsonBody;
   const board = await Board.findById(id);
   if (session.user.email !== board.adminEmail) {
     return Response.json(false);
@@ -73,6 +74,7 @@ export async function PUT(req) {
       description,
       visibility,
       allowedEmails,
+      archived,
     })
   );
 }

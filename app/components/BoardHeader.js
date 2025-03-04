@@ -10,7 +10,11 @@ export default function BoardHeader({ onNewFeedback }) {
   const { sortOrFilter, setSortOrFilter, searchPhrase, setSearchPhrase } =
     useContext(FeedbacksFetchContext);
   const slug = UseBoardSlug();
-  const { name: boardName, description } = useContext(BoardInfoContext);
+  const {
+    name: boardName,
+    description,
+    archived,
+  } = useContext(BoardInfoContext);
   function openFeedbackPopupForm() {
     setShowFeedbackPopupForm(true);
   }
@@ -55,9 +59,11 @@ export default function BoardHeader({ onNewFeedback }) {
           </div>
         </div>
         <div>
-          <Button primary={1} onClick={openFeedbackPopupForm}>
-            Make a suggestion
-          </Button>
+          {!archived && (
+            <Button primary={1} onClick={openFeedbackPopupForm}>
+              Make a suggestion
+            </Button>
+          )}
         </div>
       </div>
     </>
