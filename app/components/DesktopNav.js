@@ -9,6 +9,7 @@ import {
   loginAndRedirect,
   logoutAndRedirect,
 } from "../hooks/AppContext";
+import NotificationsButton from "./NotificationsButton";
 
 export default function DesktopNav() {
   const [showUserPopup, setShowUserPopup] = useState(false);
@@ -64,6 +65,7 @@ export default function DesktopNav() {
               />
               <span className="px-2">{session.user.name.split(" ")[0]}</span>
             </button>
+            <NotificationsButton />
           </>
         )}
         {sessionStatus === "unauthenticated" && (

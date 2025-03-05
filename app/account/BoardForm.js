@@ -27,7 +27,7 @@ export default function BoardForm({
   const [visibility, setVisibility] = useState(defaultVisibility || "public");
   const [style, setStyle] = useState(defaultStyle || "hyper");
   const [allowedEmails, setAllowedEmails] = useState(
-    defaultAllowedEmails?.join("\n") || ""
+    defaultAllowedEmails || ""
   );
   const [archived, setArchived] = useState(defaultArchived || false);
   const router = useRouter();
@@ -147,7 +147,7 @@ export default function BoardForm({
             <div className="grow flex justify-end">
               <BoardInfoContext.Provider value={{ style }}>
                 <Button
-                  primary
+                  primary={1}
                   className="text-sm"
                   onClick={handleChangeGradientButtonClick}
                 >

@@ -5,6 +5,7 @@ import { Vote } from "@/app/models/Vote";
 import { Feedback } from "@/app/models/Feedback";
 import { canWeAccessThisBoard } from "@/app/libs/boardApiFunctions";
 import { Board } from "@/app/models/Board";
+import { Notification } from "@/app/models/Notification";
 
 async function recountVotes(feedbackId) {
   const count = await Vote.countDocuments({ feedbackId });
@@ -42,6 +43,12 @@ export async function POST(req) {
   } else {
     const voteDoc = await Vote.create({ feedbackId, userEmail });
     await recountVotes(feedbackId);
+    await Notification.create({
+      type: "vote",
+      sourceUserName: session?.user?.name,
+      destinationUserEmail: feedback.userEmail,
+      feedbackId: feedback._id,
+    });
     return Response.json(voteDoc);
   }
 }

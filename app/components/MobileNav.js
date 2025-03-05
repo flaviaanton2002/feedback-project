@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { loginAndRedirect, logoutAndRedirect } from "../hooks/AppContext";
 import { useRouter } from "next/navigation";
+import NotificationsButton from "./NotificationsButton";
 
 export default function MobileNav() {
   const [navOpen, setNavOpen] = useState(false);
@@ -15,6 +16,9 @@ export default function MobileNav() {
   }
   return (
     <>
+      <div className="md:hidden">
+        <NotificationsButton />
+      </div>
       <label
         onClick={() => setNavOpen((prev) => !prev)}
         className="block md:hidden mobile-nav cursor-pointer"
