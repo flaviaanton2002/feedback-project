@@ -2,6 +2,11 @@ import axios from "axios";
 import Button from "../components/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BoardHeaderGradient from "../components/BoardHeaderGradient";
+import Popup from "../components/Popup";
+import Tick from "../components/icons/Tick";
+import Edit from "../components/icons/Edit";
+import { BoardInfoContext } from "../hooks/UseBoardInfo";
 
 export default function BoardForm({
   _id,
@@ -9,15 +14,18 @@ export default function BoardForm({
   slug: defaultSlug,
   description: defaultDescription,
   visibility: defaultVisibility = "public",
-  allowedEmails: defaultAllowedEmails,
-  archived: defaultArchived,
+  allowedEmails: defaultAllowedEmails = "",
+  archived: defaultArchived = false,
+  style: defaultStyle = "hyper",
   buttonText = "",
   onSubmit,
 }) {
+  const [showGradientsPopup, setShowGradientsPopup] = useState(false);
   const [name, setName] = useState(defaultName || "");
   const [slug, setSlug] = useState(defaultSlug || "");
   const [description, setDescription] = useState(defaultDescription || "");
   const [visibility, setVisibility] = useState(defaultVisibility || "public");
+  const [style, setStyle] = useState(defaultStyle || "hyper");
   const [allowedEmails, setAllowedEmails] = useState(
     defaultAllowedEmails?.join("\n") || ""
   );
@@ -29,6 +37,7 @@ export default function BoardForm({
       slug,
       description,
       visibility,
+      style,
       allowedEmails: allowedEmails.split("\n"),
     };
   }
@@ -43,6 +52,10 @@ export default function BoardForm({
       .then(() => {
         setArchived((prev) => !prev);
       });
+  }
+  function handleChangeGradientButtonClick(e) {
+    e.preventDefault();
+    setShowGradientsPopup(true);
   }
   return (
     <form className="max-w-md mx-auto" onSubmit={handleFormSubmit}>
@@ -125,6 +138,34 @@ export default function BoardForm({
           </label>
         </div>
       )}
+      <div className="my-4">
+        <div className="grow p-2 bg-gray-200 rounded-md">
+          <div className="flex gap-2 mb-2 items-center">
+            <div className="uppercase text-sm text-gray-600">
+              Style preview:
+            </div>
+            <div className="grow flex justify-end">
+              <BoardInfoContext.Provider value={{ style }}>
+                <Button
+                  primary
+                  className="text-sm"
+                  onClick={handleChangeGradientButtonClick}
+                >
+                  <Edit className="size-4" /> Change header gradient
+                </Button>
+              </BoardInfoContext.Provider>
+            </div>
+          </div>
+
+          <div className="rounded-t-lg overflow-hidden w-full">
+            <BoardHeaderGradient
+              style={style}
+              name={name}
+              description={description}
+            />
+          </div>
+        </div>
+      </div>
       <Button
         primary={1}
         disabled={name === "" || slug === ""}
@@ -139,6 +180,53 @@ export default function BoardForm({
         >
           {archived ? "Unarchive" : "Archive"} this board
         </Button>
+      )}
+      {showGradientsPopup && (
+        <Popup
+          setShow={setShowGradientsPopup}
+          title={"Choose your gradient styling"}
+        >
+          <div className="p-4 grid grid-cols-2 gap-4">
+            {[
+              "hyper",
+              "oceanic",
+              "cotton-candy",
+              "gotham",
+              "sunset",
+              "mojave",
+            ].map((styleOptionName) => (
+              <label
+                onClick={() => {
+                  setStyle(styleOptionName);
+                  setShowGradientsPopup(false);
+                }}
+                key={styleOptionName}
+                className="flex gap-1 cursor-pointer relative"
+              >
+                <input
+                  className="hidden"
+                  type="radio"
+                  name="style"
+                  value={style}
+                />
+                <BoardHeaderGradient
+                  style={styleOptionName}
+                  name={name}
+                  description={description}
+                />
+                {style === styleOptionName && (
+                  <div className="absolute bg-white bg-opacity-60 inset-0 rounded-t-md">
+                    <div className="flex items-center justify-center w-full">
+                      <div className="border-8 border-green-600 text-green-600 rounded-full">
+                        <Tick className="size-24" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </label>
+            ))}
+          </div>
+        </Popup>
       )}
     </form>
   );

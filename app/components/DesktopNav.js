@@ -1,14 +1,19 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Popup from "./Popup";
 import { useRouter } from "next/navigation";
-import { loginAndRedirect, logoutAndRedirect } from "../hooks/AppContext";
+import {
+  AppContext,
+  loginAndRedirect,
+  logoutAndRedirect,
+} from "../hooks/AppContext";
 
 export default function DesktopNav() {
   const [showUserPopup, setShowUserPopup] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
+  const { style } = useContext(AppContext);
   const router = useRouter();
   function goAndClose(uri) {
     setShowUserPopup(false);
@@ -19,7 +24,25 @@ export default function DesktopNav() {
   }
   return (
     <>
-      <Link href="/" className="text-primary font-bold text-xl relative z-30">
+      <Link
+        href="/"
+        className={
+          "font-bold text-xl relative z-30 " +
+          (style === "hyper"
+            ? "text-red-500"
+            : style === "oceanic"
+            ? "text-blue-500"
+            : style === "cotton-candy"
+            ? "text-purple-300"
+            : style === "gotham"
+            ? "text-gray-900"
+            : style === "sunset"
+            ? "text-red-200"
+            : style === "mojave"
+            ? "text-yellow-300"
+            : "text-pink-500")
+        }
+      >
         FeedbackBoard
       </Link>
       <nav className="gap-4 grow hidden md:flex">

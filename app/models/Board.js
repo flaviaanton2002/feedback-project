@@ -12,6 +12,7 @@ const boardSchema = new Schema({
   },
   allowedEmails: { type: [String], default: [] },
   archived: { type: Boolean, default: false },
+  style: { type: String, default: "hyper" },
 });
 
 export const Board = models?.Board || model("Board", boardSchema);

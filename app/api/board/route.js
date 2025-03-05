@@ -41,7 +41,8 @@ export async function POST(req) {
     return Response.json(false);
   }
   const jsonBody = await req.json();
-  const { name, slug, description, visibility, allowedEmails } = jsonBody;
+  const { name, slug, description, visibility, allowedEmails, style } =
+    jsonBody;
   const boardDoc = await Board.create({
     name,
     slug,
@@ -49,6 +50,7 @@ export async function POST(req) {
     visibility,
     adminEmail: session.user.email,
     allowedEmails,
+    style,
   });
   return Response.json(boardDoc);
 }
@@ -61,8 +63,16 @@ export async function PUT(req) {
     return Response.json(false);
   }
   const jsonBody = await req.json();
-  const { id, name, slug, description, visibility, allowedEmails, archived } =
-    jsonBody;
+  const {
+    id,
+    name,
+    slug,
+    description,
+    visibility,
+    allowedEmails,
+    archived,
+    style,
+  } = jsonBody;
   const board = await Board.findById(id);
   if (session.user.email !== board.adminEmail) {
     return Response.json(false);
@@ -75,6 +85,7 @@ export async function PUT(req) {
       visibility,
       allowedEmails,
       archived,
+      style,
     })
   );
 }
