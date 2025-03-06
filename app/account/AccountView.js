@@ -7,11 +7,16 @@ import Edit from "../components/icons/Edit";
 export default function AccountView() {
   const { data: session, status } = useSession();
   const [boards, setBoards] = useState([]);
+  const [isPremium, setIsPremium] = useState(null);
   useEffect(() => {
     if (status === "unauthenticated") signIn("google");
     if (status === "authenticated") {
       axios.get("/api/board").then((res) => {
         setBoards(res.data);
+      });
+      axios.get("/api/subscription").then((res) => {
+        const status = res.data?.stripeSubscriptionData?.object?.status;
+        setIsPremium(status === "active");
       });
     }
   }, [status]);
@@ -21,6 +26,7 @@ export default function AccountView() {
   if (status === "unauthenticated") {
     return <>Unauthenticated. Redirecting...</>;
   }
+  const canWeCreateBoards = boards?.length === 0 || isPremium;
   return (
     <>
       <h1 className="text-center text-4xl mb-8">Your boards:</h1>
@@ -58,12 +64,14 @@ export default function AccountView() {
             </div>
           </div>
         ))}
-        <Link
-          href={"/account/new-board"}
-          className="flex items-center justify-center bg-rose-300 rounded-md shadow-sm"
-        >
-          <span>Add new board+</span>
-        </Link>
+        {canWeCreateBoards && (
+          <Link
+            href={"/account/new-board"}
+            className="flex items-center justify-center bg-rose-300 rounded-md shadow-sm py-2"
+          >
+            <span>Add new board+</span>
+          </Link>
+        )}
       </div>
     </>
   );

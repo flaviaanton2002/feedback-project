@@ -14,7 +14,7 @@ export default function BoardForm({
   slug: defaultSlug,
   description: defaultDescription,
   visibility: defaultVisibility = "public",
-  allowedEmails: defaultAllowedEmails = "",
+  allowedEmails: defaultAllowedEmails = [],
   archived: defaultArchived = false,
   style: defaultStyle = "hyper",
   buttonText = "",
@@ -27,7 +27,7 @@ export default function BoardForm({
   const [visibility, setVisibility] = useState(defaultVisibility || "public");
   const [style, setStyle] = useState(defaultStyle || "hyper");
   const [allowedEmails, setAllowedEmails] = useState(
-    defaultAllowedEmails || ""
+    defaultAllowedEmails?.join("\n") || ""
   );
   const [archived, setArchived] = useState(defaultArchived || false);
   const router = useRouter();

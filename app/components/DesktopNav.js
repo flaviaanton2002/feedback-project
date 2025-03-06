@@ -90,6 +90,12 @@ export default function DesktopNav() {
           </button>
           <button
             className="block w-full text-center py-4 uppercase"
+            onClick={() => goAndClose("/subscription")}
+          >
+            Subscription
+          </button>
+          <button
+            className="block w-full text-center py-4 uppercase"
             onClick={() => {
               setShowUserPopup(false);
               logoutAndRedirect(router, signOut);
